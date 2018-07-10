@@ -19,6 +19,7 @@ import butterknife.ButterKnife;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.ViewHolder> {
+    private final String TAG = PhotosAdapter.class.getSimpleName();
     private Context context;
     private List<Photo> photos;
 
@@ -53,7 +54,7 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.ViewHolder
 
     @Override
     public int getItemCount() {
-        return 0;
+        return photos.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {

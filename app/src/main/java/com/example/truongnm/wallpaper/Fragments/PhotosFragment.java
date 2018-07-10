@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,8 @@ import android.widget.ProgressBar;
 import com.example.truongnm.wallpaper.Adapters.PhotosAdapter;
 import com.example.truongnm.wallpaper.Models.Photo;
 import com.example.truongnm.wallpaper.R;
+import com.example.truongnm.wallpaper.Webservices.ApiInterface;
+import com.example.truongnm.wallpaper.Webservices.ServiceGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +23,9 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * Created by truongnm on 7/8/18.
@@ -47,11 +53,49 @@ public class PhotosFragment extends Fragment {
         recyclerView.setLayoutManager(linearLayoutManager);
 
         photosAdapter = new PhotosAdapter(getActivity(), photos);
+        recyclerView.setAdapter(photosAdapter);
+
+        showProgressBar(true);
+        getPhotos();
         return view;
+    }
+
+    private void getPhotos(){
+        ApiInterface apiInterface = ServiceGenerator.createService(ApiInterface.class);
+        Call<List<Photo>> call = apiInterface.getPhotos();
+        call.enqueue(new Callback<List<Photo>>() {
+            @Override
+            public void onResponse(Call<List<Photo>> call, Response<List<Photo>> response) {
+                if(response.isSuccessful()){
+                    photos.addAll(response.body());
+                    photosAdapter.notifyDataSetChanged();
+                } else {
+                    Log.e(TAG, "fail " + response.message());
+                }
+                showProgressBar(false);
+            }
+
+            @Override
+            public void onFailure(Call<List<Photo>> call, Throwable t) {
+                Log.e(TAG, "fail " + t.getMessage());
+                showProgressBar(false);
+            }
+        });
+    }
+
+    private void showProgressBar(boolean isShow){
+        if(isShow){
+            progressBar.setVisibility(View.VISIBLE);
+            recyclerView.setVisibility(View.GONE);
+        } else {
+            progressBar.setVisibility(View.GONE);
+            recyclerView.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        unbinder.unbind();
     }
 }
