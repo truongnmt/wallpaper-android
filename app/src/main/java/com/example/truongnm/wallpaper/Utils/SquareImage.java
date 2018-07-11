@@ -18,8 +18,11 @@ public class SquareImage extends ImageView {
         super(context, attrs, defStyleAttr);
     }
 
-    public SquareImage(Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        super(context, attrs, defStyleAttr, defStyleRes);
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        // This function has 2 params are width and height.
+        // And now both of them equal width of phone
         setMeasuredDimension(getMeasuredWidth(), getMeasuredWidth());
     }
 }
