@@ -1,5 +1,6 @@
 package com.example.truongnm.wallpaper.Activities;
 
+import android.arch.core.util.Function;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -9,12 +10,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.example.truongnm.wallpaper.Adapters.GlideApp;
 import com.example.truongnm.wallpaper.Models.Photo;
 import com.example.truongnm.wallpaper.R;
+import com.example.truongnm.wallpaper.Utils.Functions;
 import com.example.truongnm.wallpaper.Webservices.ApiInterface;
 import com.example.truongnm.wallpaper.Webservices.ServiceGenerator;
 import com.github.clans.fab.FloatingActionButton;
@@ -42,6 +45,8 @@ public class FullScreenPhotoActivity extends AppCompatActivity {
     FloatingActionButton fabWallpaper;
     @BindView(R.id.activity_fullscreen_photo_username)
     TextView username;
+
+    private Bitmap photoBitmap;
 
     private Unbinder unbinder;
 
@@ -90,6 +95,7 @@ public class FullScreenPhotoActivity extends AppCompatActivity {
                         @Override
                         public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
                             fullscreenPhoto.setImageBitmap(resource);
+                            photoBitmap = resource;
                         }
                     });
         }catch (Exception e){
@@ -104,6 +110,13 @@ public class FullScreenPhotoActivity extends AppCompatActivity {
 
     @OnClick(R.id.activity_fullscreen_photo_fab_wallpaper)
     public void setFabWallpaper(){
+        if(photoBitmap != null){
+            if(Functions.setWallpaper(FullScreenPhotoActivity.this, photoBitmap)){
+                Toast.makeText(FullScreenPhotoActivity.this, "Set Wallpaper Successfully", Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(FullScreenPhotoActivity.this, "Set Wallpaper Failed", Toast.LENGTH_LONG).show();
+            }
+        }
         fabMenu.close(true);
     }
 
