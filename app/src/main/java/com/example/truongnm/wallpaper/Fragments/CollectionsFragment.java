@@ -13,14 +13,17 @@ import android.widget.ProgressBar;
 import com.example.truongnm.wallpaper.Adapters.CollectionsAdapter;
 import com.example.truongnm.wallpaper.Models.Collection;
 import com.example.truongnm.wallpaper.R;
+import com.example.truongnm.wallpaper.Utils.Functions;
 import com.example.truongnm.wallpaper.Webservices.ApiInterface;
 import com.example.truongnm.wallpaper.Webservices.ServiceGenerator;
+import com.google.gson.internal.bind.CollectionTypeAdapterFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnItemClick;
 import butterknife.Unbinder;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -50,6 +53,16 @@ public class CollectionsFragment extends Fragment {
         showProgressBar(true);
         getCollections();
         return view;
+    }
+
+    @OnItemClick(R.id.fragment_collection_gridview)
+    public void setGridView(int position){
+        Collection collection = collections.get(position);
+        Bundle bundle = new Bundle();
+        bundle.putInt("collectionId", collection.getId());
+        CollectionFragment collectionFragment = new CollectionFragment();
+        collectionFragment.setArguments(bundle);
+        Functions.changeMainFragmentWithBack(getActivity(), collectionFragment);
     }
 
     private void getCollections(){
