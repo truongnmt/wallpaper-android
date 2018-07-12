@@ -3,6 +3,8 @@ package com.example.truongnm.wallpaper.Activities;
 import android.arch.core.util.Function;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.DrawFilter;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -18,11 +20,13 @@ import com.example.truongnm.wallpaper.Adapters.GlideApp;
 import com.example.truongnm.wallpaper.Models.Photo;
 import com.example.truongnm.wallpaper.R;
 import com.example.truongnm.wallpaper.Utils.Functions;
+import com.example.truongnm.wallpaper.Utils.RealmController;
 import com.example.truongnm.wallpaper.Webservices.ApiInterface;
 import com.example.truongnm.wallpaper.Webservices.ServiceGenerator;
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
 
+import butterknife.BindDrawable;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -46,9 +50,15 @@ public class FullScreenPhotoActivity extends AppCompatActivity {
     @BindView(R.id.activity_fullscreen_photo_username)
     TextView username;
 
-    private Bitmap photoBitmap;
+    @BindDrawable(R.drawable.ic_check_favorite)
+    Drawable icFavorite;
+    @BindDrawable(R.drawable.ic_check_favorited)
+    Drawable icFavorited;
 
+    private Bitmap photoBitmap;
     private Unbinder unbinder;
+    private Photo photo;
+    private RealmController realmController;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -59,6 +69,11 @@ public class FullScreenPhotoActivity extends AppCompatActivity {
         Intent intent = getIntent();
         String photoId = intent.getStringExtra("photoId");
         getPhoto(photoId);
+
+        realmController = new RealmController();
+        if(realmController.isPhotoExist(photoId)){
+            fabFavorite.setImageDrawable(icFavorited);
+        }
     }
 
     private void getPhoto(String id){
@@ -68,7 +83,7 @@ public class FullScreenPhotoActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<Photo> call, Response<Photo> response) {
                 if(response.isSuccessful()){
-                    Photo photo = response.body();
+                    photo = response.body();
                     updateUI(photo);
                 }
             }
@@ -105,6 +120,15 @@ public class FullScreenPhotoActivity extends AppCompatActivity {
 
     @OnClick(R.id.activity_fullscreen_photo_fab_favorite)
     public void setFabFavorite(){
+        if (realmController.isPhotoExist(photo.getId())) {
+            realmController.deletePhoto(photo);
+            fabFavorite.setImageDrawable(icFavorite);
+            Toast.makeText(FullScreenPhotoActivity.this, "Remove favorite", Toast.LENGTH_LONG).show();
+        } else {
+            realmController.savePhoto(photo);
+            fabFavorite.setImageDrawable(icFavorited);
+            Toast.makeText(FullScreenPhotoActivity.this, "Favorite", Toast.LENGTH_LONG).show();
+        }
         fabMenu.close(true);
     }
 

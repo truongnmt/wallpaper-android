@@ -18,7 +18,7 @@ public class RealmController {
         realm.commitTransaction();
     }
 
-    public void deletePhoto(Photo photo){
+    public void deletePhoto(final Photo photo){
         realm.executeTransaction(new Realm.Transaction(){
             @Override
             public void execute(Realm realm){
@@ -28,8 +28,8 @@ public class RealmController {
         });
     }
 
-    public boolean isPhotoExist(Photo photo){
-        Photo resultPhoto = realm.where(Photo.class).equalTo("id", photo.getId()).findFirst();
+    public boolean isPhotoExist(String photoId){
+        Photo resultPhoto = realm.where(Photo.class).equalTo("id", photoId).findFirst();
         if(resultPhoto == null)
             return false;
         return true;
